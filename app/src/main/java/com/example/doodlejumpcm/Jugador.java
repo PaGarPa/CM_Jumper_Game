@@ -10,6 +10,7 @@ public class Jugador {
     public float velocidadY = 0;
     private final float GRAVEDAD = 0.8f;
     private final float FUERZA_SALTO = -25f;
+    private final float FUERZA_MUELLE = -60f; // Impulso de unas 10 plataformas
     public int ancho = 100, alto = 100;
     private int screenWidth;
 
@@ -29,6 +30,10 @@ public class Jugador {
 
     public void saltar() {
         velocidadY = FUERZA_SALTO;
+    }
+
+    public void saltoMuelle() {
+        velocidadY = FUERZA_MUELLE;
     }
 
     public void dibujar(Canvas canvas, Paint paint) {

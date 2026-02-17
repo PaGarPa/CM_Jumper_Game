@@ -96,14 +96,7 @@ public class VistaJuego extends SurfaceView implements Runnable {
             player.y -= 30; // Vuela hacia arriba
             long tiempoTranscurrido = System.currentTimeMillis() - jetpackTiempo;
             
-            // Sumar 20 puntos por cada segundo
-            int segundosTranscurridos = (int) (tiempoTranscurrido / 1000);
-            if (segundosTranscurridos > jetpackPuntosAcumulados && segundosTranscurridos <= 4) {
-                score += 20;
-                jetpackPuntosAcumulados++;
-            }
-
-            if (tiempoTranscurrido > 4000) { // 4 segundos de vuelo
+            if (tiempoTranscurrido > 1500) { // 1,5 segundos de vuelo
                 jetpackActivo = false;
             }
         } else {
@@ -117,11 +110,19 @@ public class VistaJuego extends SurfaceView implements Runnable {
         }
 
         for (Plataforma p : plataformas) {
-            if (!jetpackActivo && player.velocidadY > 0 && Rect.intersects(player.getHitbox(), p.getHitbox())) {
-                player.saltar();
-                if (!p.pisada) {
-                    p.pisada = true;
-                    score++;
+            if (!jetpackActivo && player.velocidadY > 0) {
+                if (Rect.intersects(player.getHitbox(), p.getHitbox())) {
+                    player.saltar();
+                    if (!p.pisada) {
+                        p.pisada = true;
+                        score++;
+                    }
+                    if (p.esRompible) {
+                        p.rota = true;
+                    }
+                } else if (p.tieneMuelle && Rect.intersects(player.getHitbox(), p.getMuelleHitbox())) {
+                    player.saltoMuelle();
+                    p.tieneMuelle = false; // El muelle se usa una vez
                 }
             }
             if (p.tieneJetpack && Rect.intersects(player.getHitbox(), p.getJetpackHitbox())) {
@@ -129,6 +130,7 @@ public class VistaJuego extends SurfaceView implements Runnable {
                 jetpackActivo = true;
                 jetpackTiempo = System.currentTimeMillis();
                 jetpackPuntosAcumulados = 0;
+                score += 50; // Sume 50 puntos en el momento que lo cojes
             }
             p.y += scrollAmount;
         }
@@ -142,7 +144,12 @@ public class VistaJuego extends SurfaceView implements Runnable {
                 p.y = minY - 300;
                 p.x = random.nextInt(screenX - 200);
                 p.pisada = false;
-                p.tieneJetpack = (random.nextInt(30) == 0); // 1 de cada 30 plataformas
+                p.rota = false;
+                
+                // Ratio de aparición
+                p.tieneJetpack = (random.nextInt(30) == 0); // 1 de cada 30
+                p.tieneMuelle = !p.tieneJetpack && (random.nextInt(10) == 0); // 1 de cada 10
+                p.esRompible = !p.tieneJetpack && !p.tieneMuelle && (random.nextInt(20) == 0); // 1 de cada 20
             }
         }
 
