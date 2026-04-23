@@ -71,7 +71,13 @@ public class VistaJuego extends SurfaceView implements Runnable {
     private void reiniciarJuego() {
         player = new Jugador(screenX, screenY);
         plataformas = new ArrayList<>();
-        for (int i = 0; i < 6; i++) {
+        
+        // Creamos la primera plataforma justo debajo del jugador
+        Plataforma base = new Plataforma((int)player.x - 50, (int)player.y + player.alto + 50);
+        plataformas.add(base);
+
+        // El resto de plataformas se generan aleatoriamente como antes
+        for (int i = 1; i < 6; i++) {
             Plataforma p = new Plataforma(random.nextInt(screenX - 200), screenY - (i * 300));
             plataformas.add(p);
         }
@@ -173,7 +179,7 @@ public class VistaJuego extends SurfaceView implements Runnable {
                 paint.setColor(Color.BLACK);
                 paint.setTextSize(60);
                 String scoreText = "Score: " + score;
-                c.drawText(scoreText, screenX - paint.measureText(scoreText) - 50, 130, paint);
+                c.drawText(scoreText, screenX - paint.measureText(scoreText) - 50, screenY * 0.1f, paint);
             }
 
             if (currentState == State.MENU) {
